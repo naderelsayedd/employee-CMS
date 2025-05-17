@@ -2,18 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\StateResource\Pages;
-use App\Filament\Resources\StateResource\RelationManagers;
-use App\Models\State;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\State;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Resource;
 use Filament\Forms\Components\Select;
-
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use App\Filament\Resources\StateResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\StateResource\RelationManagers;
 
 class StateResource extends Resource
 {
@@ -67,9 +69,21 @@ class StateResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\Action::make('view')
+                    ->label('View')
+                    ->icon('heroicon-o-eye')
+                    ->action(fn($record, $livewire) => $livewire->dispatch('open-view-modal', ['recordId' => $record->getKey()]))
+                    ->requiresConfirmation(false)
+                    ->modalHeading('State Details')
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->modalContent(fn($record) => static::infolist(
+                        Infolist::make()
+                            ->record($record)
+                    )),
                 Tables\Actions\EditAction::make(),
             ])
+
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -77,6 +91,24 @@ class StateResource extends Resource
             ]);
     }
 
+    public static function infoList(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Section::make('State Information')
+                    ->description('Details about the state')
+                    ->schema([
+                        TextEntry::make('country.name')
+                            ->label('Country'),
+                        TextEntry::make('name')
+                            ->label('State Name'),
+                        TextEntry::make('created_at')
+                            ->label('Created At')
+                            ->dateTime(),
+                    ])
+                    ->columns(3)
+            ]);
+    }
     public static function getRelations(): array
     {
         return [
@@ -89,7 +121,7 @@ class StateResource extends Resource
         return [
             'index' => Pages\ListStates::route('/'),
             'create' => Pages\CreateState::route('/create'),
-            'view' => Pages\ViewState::route('/{record}'),
+            // 'view' => Pages\ViewState::route('/{record}'),
             'edit' => Pages\EditState::route('/{record}/edit'),
         ];
     }

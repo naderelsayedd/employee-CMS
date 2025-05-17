@@ -2,17 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\EmployeeResource\Pages;
-use App\Filament\Resources\EmployeeResource\RelationManagers;
-use App\Models\Employee;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Employee;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Livewire\Attributes\Title;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Resource;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use App\Filament\Resources\EmployeeResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\EmployeeResource\RelationManagers;
+use Filament\Tables\Filters\SelectFilter;
 
 class EmployeeResource extends Resource
 {
@@ -86,7 +90,7 @@ class EmployeeResource extends Resource
                                 \App\Models\City::Where('state_id', $get('state_id'))
                                     ->pluck('name', 'id')
                             ),
-                            // ->relationship(name: "city", titleAttribute: "name"),
+                        // ->relationship(name: "city", titleAttribute: "name"),
                         Forms\Components\Select::make('department_id')
                             ->required()
                             ->relationship(name: "department", titleAttribute: "name")
@@ -98,6 +102,7 @@ class EmployeeResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('first_name', 'asc')
             ->columns([
                 Tables\Columns\TextColumn::make('first_name')
                     ->searchable(),
@@ -115,16 +120,16 @@ class EmployeeResource extends Resource
                 Tables\Columns\TextColumn::make('date_hired')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('country_id')
+                Tables\Columns\TextColumn::make('country.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('state_id')
+                Tables\Columns\TextColumn::make('state.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('city_id')
+                Tables\Columns\TextColumn::make('city.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('department_id')
+                Tables\Columns\TextColumn::make('department.name')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -137,16 +142,62 @@ class EmployeeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('country')
+                ->relationship('country', 'name')
+                ->label('Filter by Country')
+                ->multiple()
+                ->searchable(),
+                SelectFilter::make('department')
+                ->relationship('department', 'name')
+                ->searchable()
+                ->multiple()
+                ->label('Filter by Department'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\Action::make('view')
+                    ->label('View')
+                    ->icon('heroicon-o-eye')
+                    ->action(fn($record, $livewire) => $livewire->dispatch('open-view-modal', ['recordId' => $record->getKey()]))
+                    ->requiresConfirmation(false)
+                    ->modalHeading('State Details')
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->modalContent(fn($record) => static::infolist(
+                        Infolist::make()
+                            ->record($record)
+                    )),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ]);
+    }
+
+    public static function infoList(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Section::make('Employee Information')
+                    ->description('Details about the state')
+                    ->schema([
+                        TextEntry::make('first_name')
+                            ->label('First Name'),
+                        TextEntry::make('middle_name')
+                            ->label('Middle Name'),
+                        TextEntry::make('last_name')
+                            ->label('Last Name'),
+                        TextEntry::make('country.name')
+                            ->label('Country'),
+                        TextEntry::make('state.name')
+                            ->label('State'),
+                        TextEntry::make('city.name')
+                            ->label('City'),
+                        TextEntry::make('department.name')
+                            ->label('Department'),
+                    ])
+                    ->columns(3)
             ]);
     }
 
@@ -162,7 +213,7 @@ class EmployeeResource extends Resource
         return [
             'index' => Pages\ListEmployees::route('/'),
             'create' => Pages\CreateEmployee::route('/create'),
-            'view' => Pages\ViewEmployee::route('/{record}'),
+            // 'view' => Pages\ViewEmployee::route('/{record}'),
             'edit' => Pages\EditEmployee::route('/{record}/edit'),
         ];
     }
