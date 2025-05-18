@@ -21,6 +21,7 @@ class CountryResource extends Resource
 
     protected static ?string $navigationLabel = "Countries List" ;
 
+    protected static ?string $recordTitleAttribute = 'name';
     // protected static ?string $navigationGroup = "System Settings";
     protected static ?string $navigationIcon = 'heroicon-o-flag';
 
