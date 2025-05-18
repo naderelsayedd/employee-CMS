@@ -13,12 +13,13 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Select;
+use Filament\Tables\Filters\SelectFilter;
 
 class CityResource extends Resource
 {
     protected static ?string $model = City::class;
 
-    protected static ?string $navigationGroup = "System Settings";
+    // protected static ?string $navigationGroup = "System Settings";
 
     protected static ?string $navigationIcon = 'heroicon-o-folder';
 
@@ -63,7 +64,11 @@ class CityResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('Filter By State')
+                ->relationship('state' , 'name')
+                ->multiple()
+                ->searchable()
+                ->label('Filter Cities By State')
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

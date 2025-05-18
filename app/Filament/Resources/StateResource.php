@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Tables;
 use App\Models\State;
 use Filament\Forms\Form;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -21,7 +22,7 @@ class StateResource extends Resource
 {
     protected static ?string $model = State::class;
 
-    protected static ?string $navigationGroup = "System Settings";
+    // protected static ?string $navigationGroup = "System Settings";
 
     protected static ?string $navigationIcon = 'heroicon-o-cube';
 
@@ -54,7 +55,6 @@ class StateResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('country.name')
-                    ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -66,7 +66,10 @@ class StateResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('country')
+                    ->relationship('country', 'name')
+                    ->multiple()
+                    ->label('Filter By Country')
             ])
             ->actions([
                 Tables\Actions\Action::make('view')

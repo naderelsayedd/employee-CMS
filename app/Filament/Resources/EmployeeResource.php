@@ -81,6 +81,7 @@ class EmployeeResource extends Resource
                             )
                             ->reactive()
                             ->afterStateUpdated(fn(callable $set) => $set('city_id', null))
+                            ->searchable()
                             ->native(0),
                         Forms\Components\Select::make('city_id')
                             ->required()
@@ -102,19 +103,23 @@ class EmployeeResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultPaginationPageOption(option: 5)
             ->defaultSort('first_name', 'asc')
             ->columns([
                 Tables\Columns\TextColumn::make('first_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('middle_name')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('last_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('address')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('zip_code')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('date_of_birth')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('date_hired')
@@ -127,6 +132,7 @@ class EmployeeResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('city.name')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('department.name')
@@ -140,18 +146,19 @@ class EmployeeResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
             ])
             ->filters([
                 SelectFilter::make('country')
-                ->relationship('country', 'name')
-                ->label('Filter by Country')
-                ->multiple()
-                ->searchable(),
+                    ->relationship('country', 'name')
+                    ->label('Filter by Country')
+                    ->multiple()
+                    ->searchable(),
                 SelectFilter::make('department')
-                ->relationship('department', 'name')
-                ->searchable()
-                ->multiple()
-                ->label('Filter by Department'),
+                    ->relationship('department', 'name')
+                    ->searchable()
+                    // ->multiple()
+                    ->label('Filter by Department'),
             ])
             ->actions([
                 Tables\Actions\Action::make('view')

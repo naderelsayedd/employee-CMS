@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DepartmentResource\Pages;
 use App\Filament\Resources\DepartmentResource\RelationManagers;
+use App\Filament\Resources\DepartmentResource\RelationManagers\EmployeeRelationManager;
 use App\Models\Department;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -17,7 +18,7 @@ class DepartmentResource extends Resource
 {
     protected static ?string $model = Department::class;
 
-    protected static ?string $navigationGroup = "System Settings";
+    // protected static ?string $navigationGroup = "System Settings";
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
     public static function getNavigationBadge(): ?string
@@ -66,7 +67,7 @@ class DepartmentResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            EmployeeRelationManager::class,
         ];
     }
 

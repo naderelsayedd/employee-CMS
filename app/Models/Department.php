@@ -8,7 +8,7 @@ class Department extends Model
 {
     protected $fillable = ['name'];
 
-    public function employees()
+    public function employee()
     {
         return $this->hasMany(Employee::class);
     }
