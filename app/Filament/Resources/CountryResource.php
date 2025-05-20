@@ -19,7 +19,7 @@ class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    protected static ?string $navigationLabel = "Countries List" ;
+    // protected static ?string $navigationLabel = "Countries List" ;
 
     protected static ?string $recordTitleAttribute = 'name';
     // protected static ?string $navigationGroup = "System Settings";
@@ -61,6 +61,7 @@ class CountryResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

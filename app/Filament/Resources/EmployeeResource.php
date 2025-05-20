@@ -113,10 +113,11 @@ class EmployeeResource extends Resource
             ]);
     }
 
+
     public static function table(Table $table): Table
     {
         return $table
-            ->defaultPaginationPageOption(option: 5)
+            ->defaultPaginationPageOption(option: 10)
             ->defaultSort('first_name', 'asc')
             ->columns([
                 Tables\Columns\TextColumn::make('first_name')
@@ -170,10 +171,13 @@ class EmployeeResource extends Resource
                 SelectFilter::make('department')
                     ->relationship('department', 'name')
                     ->searchable()
-                    // ->multiple()
+                    ->multiple()
                     ->label('Filter by Department'),
             ])
             ->actions([
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
                 Tables\Actions\Action::make('view')
                     ->label('View')
                     ->icon('heroicon-o-eye')
@@ -189,8 +193,12 @@ class EmployeeResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
+
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -235,6 +243,15 @@ class EmployeeResource extends Resource
             'create' => Pages\CreateEmployee::route('/create'),
             // 'view' => Pages\ViewEmployee::route('/{record}'),
             'edit' => Pages\EditEmployee::route('/{record}/edit'),
+            'trash' => Pages\TrashEmployees::route('/trash'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 }
