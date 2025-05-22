@@ -14,27 +14,29 @@ class StatsOverview extends BaseWidget
     {
         return [
             Stat::make('Total Employees', Employee::count())
-                ->description('All employees in the system')
-                ->descriptionIcon('heroicon-m-users')
-                ->url(route('filament.admin.resources.employees.index'))
-                ->color('success'),
+                ->description('Total Employees In System')
+                ->descriptionIcon('heroicon-m-user')
+                ->color('primary')
+                ->url(route('filament.admin.resources.employees.index')),
 
-            Stat::make('Departments', Department::count())
-                ->description('Total number of departments')
+
+            Stat::make('Total Departments', Department::count())
+                ->description('Total Departments')
                 ->descriptionIcon('heroicon-m-building-office')
                 ->url(route('filament.admin.resources.departments.index'))
                 ->color('primary'),
 
-            Stat::make('Total Countries', Country::count())
-                ->description('All Branch Countries')
-                ->descriptionIcon('heroicon-m-flag')
-                ->url(route('filament.admin.resources.countries.index'))
-                ->color('grey')
+
+            Stat::make('Hired Recently', Employee::where('date_hired', '>=', now()->subMonths(1))->count())
+                ->description('Employees Hired Last Month')
+                ->descriptionIcon('heroicon-m-calendar')
+                ->color('primary'),
+
         ];
     }
 
     public function getColumns(): int
     {
-        return 2;
+        return 3;
     }
 }

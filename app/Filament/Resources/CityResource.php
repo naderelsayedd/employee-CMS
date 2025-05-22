@@ -19,7 +19,7 @@ class CityResource extends Resource
 {
     protected static ?string $model = City::class;
 
-    // protected static ?string $navigationGroup = "System Settings";
+    protected static ?string $navigationGroup = "System Settings";
     protected static ?string $recordTitleAttribute = 'name';
     protected static ?string $navigationIcon = 'heroicon-o-folder';
 

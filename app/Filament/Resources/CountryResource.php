@@ -19,10 +19,11 @@ class CountryResource extends Resource
 {
     protected static ?string $model = Country::class;
 
-    // protected static ?string $navigationLabel = "Countries List" ;
+    protected static ?string $navigationLabel = "Countries List";
+
+    protected static ?string $navigationGroup = "System Settings";
 
     protected static ?string $recordTitleAttribute = 'name';
-    // protected static ?string $navigationGroup = "System Settings";
     protected static ?string $navigationIcon = 'heroicon-o-flag';
 
     public static function getNavigationBadge(): ?string
